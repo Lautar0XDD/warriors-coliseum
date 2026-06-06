@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Warriors Coliseum</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --purple:#6a35c8; --purple2:#8b4fe8; --red:#e03030;
+    --green:#3cbd3c; --yellow:#f5c842; --blue:#3a80e8;
+    --bg:#1a1228; --bg2:#231840; --card:#2d2050; --card2:#382868;
+    --text:#f0eaff; --dim:#9080b8; --border:rgba(255,255,255,0.08);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  body::before{content:'';position:fixed;inset:0;
+    background:radial-gradient(circle at 15% 30%,rgba(106,53,200,.25) 0%,transparent 45%),
+               radial-gradient(circle at 85% 70%,rgba(224,48,48,.12) 0%,transparent 45%);
+    pointer-events:none;z-index:0;}
+
+  header{position:relative;z-index:10;
+    background:linear-gradient(135deg,#2d0050 0%,#1a1228 40%,#2d0050 100%);
+    border-bottom:3px solid var(--purple);
+    padding:20px 24px 0;display:flex;flex-direction:column;align-items:center;}
+
+  .logo-wrap{display:flex;align-items:center;gap:14px;margin-bottom:4px;}
+  .logo-warriors{font-family:'Fredoka One',cursive;font-size:32px;color:var(--red);
+    text-shadow:3px 3px 0 #800000,-1px -1px 0 #ff6060;letter-spacing:2px;}
+  .logo-coliseum{font-family:'Fredoka One',cursive;font-size:18px;color:var(--text);
+    letter-spacing:4px;display:block;margin-top:-2px;}
+
+  nav{display:flex;gap:0;margin-top:16px;width:100%;max-width:480px;}
+  .nav-btn{flex:1;font-family:'Fredoka One',cursive;font-size:14px;letter-spacing:1px;
+    padding:10px 8px;background:transparent;border:none;color:var(--dim);cursor:pointer;
+    border-bottom:3px solid transparent;transition:color .15s,border-color .15s;text-transform:uppercase;}
+  .nav-btn:hover{color:var(--text);}
+  .nav-btn.active{color:var(--yellow);border-bottom-color:var(--yellow);}
+
+  main{position:relative;z-index:1;max-width:720px;margin:0 auto;padding:32px 16px 48px;}
+  .page{display:none;}
+  .page.active{display:block;animation:popIn .25s ease;}
+  @keyframes popIn{from{opacity:0;transform:scale(.97) translateY(6px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;position:relative;overflow:hidden;}
+  .card-title{font-family:'Fredoka One',cursive;font-size:20px;letter-spacing:1px;margin-bottom:24px;
+    color:var(--yellow);display:flex;align-items:center;gap:10px;}
+
+  .form-group{margin-bottom:18px;}
+  label{display:block;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;
+    color:var(--dim);margin-bottom:6px;}
+  input{width:100%;background:rgba(0,0,0,.35);border:2px solid rgba(255,255,255,.1);border-radius:10px;
+    padding:12px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:16px;font-weight:600;
+    outline:none;transition:border-color .15s;}
+  input:focus{border-color:var(--purple2);}
+  input::placeholder{color:var(--dim);opacity:.6;}
+
+  .btn{font-family:'Fredoka One',cursive;font-size:16px;letter-spacing:1px;padding:13px 28px;
+    border:none;border-radius:12px;cursor:pointer;transition:transform .1s,box-shadow .15s;width:100%;}
+  .btn:active{transform:scale(.97);}
+  .btn-primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;
+    box-shadow:0 4px 16px rgba(106,53,200,.4);}
+  .btn-primary:hover{box-shadow:0 6px 24px rgba(106,53,200,.6);}
+
+  .msg{text-align:center;font-size:14px;font-weight:700;padding:10px 16px;border-radius:10px;margin-bottom:16px;}
+  .msg.error{background:rgba(224,48,48,.2);border:1px solid rgba(224,48,48,.5);color:#ff8888;}
+  .msg.success{background:rgba(60,189,60,.15);border:1px solid rgba(60,189,60,.4);color:#88ee88;}
+
+  .link-btn{background:none;border:none;color:var(--yellow);cursor:pointer;font-size:14px;
+    font-weight:700;font-family:'Nunito',sans-serif;text-decoration:underline;}
+
+  /* PROFILE */
+  .profile-top{display:flex;align-items:center;gap:20px;margin-bottom:28px;}
+  .avatar-wrap{width:72px;height:72px;flex-shrink:0;
+    background:linear-gradient(135deg,var(--purple),var(--purple2));border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    border:3px solid var(--yellow);box-shadow:0 0 16px rgba(245,200,66,.3);}
+  .profile-username{font-family:'Fredoka One',cursive;font-size:26px;color:var(--text);letter-spacing:1px;}
+  .profile-tag{font-size:12px;color:var(--dim);font-weight:700;letter-spacing:2px;
+    text-transform:uppercase;margin-top:2px;}
+
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+  .stat-box{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:12px;
+    padding:16px 12px;text-align:center;}
+  .stat-val{font-family:'Fredoka One',cursive;font-size:34px;line-height:1;margin-bottom:4px;}
+  .stat-lbl{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--dim);}
+  .stat-box.wins .stat-val{color:var(--green);}
+  .stat-box.losses .stat-val{color:var(--red);}
+  .stat-box.wr .stat-val{color:var(--yellow);}
+
+  .wr-bar-wrap{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:12px;padding:14px 18px;}
+  .wr-bar-top{display:flex;justify-content:space-between;font-size:12px;font-weight:800;
+    letter-spacing:2px;color:var(--dim);text-transform:uppercase;margin-bottom:8px;}
+  .wr-bar{height:8px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden;}
+  .wr-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--yellow));
+    border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1);width:0;}
+
+  .logout-row{text-align:right;margin-bottom:16px;}
+  .logout-btn{background:rgba(224,48,48,.15);border:1px solid rgba(224,48,48,.35);color:#ff8888;
+    font-family:'Nunito',sans-serif;font-size:12px;font-weight:800;letter-spacing:2px;
+    text-transform:uppercase;padding:7px 16px;border-radius:8px;cursor:pointer;transition:background .15s;}
+  .logout-btn:hover{background:rgba(224,48,48,.3);}
+
+  /* RANKING */
+  .ranking-list{display:flex;flex-direction:column;gap:8px;}
+  .rank-header{display:grid;grid-template-columns:40px 1fr 60px 60px 64px;
+    gap:8px;padding:0 16px 8px;font-size:11px;font-weight:800;letter-spacing:2px;
+    text-transform:uppercase;color:var(--dim);}
+  .rank-header span:nth-child(3),.rank-header span:nth-child(4){text-align:center;}
+  .rank-header span:last-child{text-align:right;}
+  .rank-row{display:grid;grid-template-columns:40px 1fr 60px 60px 64px;
+    align-items:center;gap:8px;background:rgba(0,0,0,.25);border:1px solid var(--border);
+    border-radius:12px;padding:12px 16px;transition:background .15s;}
+  .rank-row:hover{background:rgba(106,53,200,.15);}
+  .rank-row.gold{border-color:var(--yellow);background:rgba(245,200,66,.06);}
+  .rank-row.silver{border-color:#c0c0c0;background:rgba(200,200,200,.04);}
+  .rank-row.bronze{border-color:#cd7f32;background:rgba(205,127,50,.05);}
+  .rank-pos{font-family:'Fredoka One',cursive;font-size:18px;text-align:center;}
+  .rank-name{font-family:'Fredoka One',cursive;font-size:16px;color:var(--text);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .rank-wins{font-weight:800;color:var(--green);text-align:center;font-size:15px;}
+  .rank-losses{font-weight:800;color:var(--red);text-align:center;font-size:15px;}
+  .rank-wr{font-family:'Fredoka One',cursive;color:var(--yellow);text-align:right;font-size:16px;}
+  .empty{text-align:center;padding:48px 20px;color:var(--dim);font-size:15px;font-weight:700;}
+
+  /* TURBO */
+  .step{display:flex;gap:16px;margin-bottom:24px;align-items:flex-start;}
+  .step-num{font-family:'Fredoka One',cursive;font-size:22px;color:var(--yellow);
+    background:rgba(245,200,66,.1);border:2px solid var(--yellow);border-radius:50%;
+    width:38px;height:38px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .step-title{font-family:'Fredoka One',cursive;font-size:15px;color:var(--text);margin-bottom:6px;}
+  .step-text{font-size:14px;line-height:1.65;color:var(--dim);font-weight:600;}
+  .code{background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1);border-left:3px solid var(--purple2);
+    border-radius:8px;padding:14px 16px;margin:10px 0;font-family:'Courier New',monospace;
+    font-size:13px;color:#88ddaa;white-space:pre-wrap;}
+  .pill{display:inline-block;background:rgba(106,53,200,.25);border:1px solid var(--purple2);
+    color:var(--text);border-radius:6px;padding:2px 8px;font-size:13px;font-family:monospace;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="26" cy="14" r="11" stroke="#1a3a8a" stroke-width="2.5" fill="white"/>
+      <circle cx="21" cy="13" r="2.5" fill="#1a3a8a"/>
+      <circle cx="31" cy="13" r="2.5" fill="#1a3a8a"/>
+    </svg>
+    <div>
+      <div class="logo-warriors">WARRIORS</div>
+      <span class="logo-coliseum">COLISEUM</span>
+    </div>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showPage('ranking',this)">🏆 Ranking</button>
+    <button class="nav-btn" id="nav-profile" onclick="showPage('auth',this)">👤 Mi Perfil</button>
+    <button class="nav-btn" onclick="showPage('turbo',this)">🎮 TurboWarp</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- RANKING -->
+  <div class="page active" id="page-ranking">
+    <div class="card">
+      <div class="card-title"><span>🏆</span> Tabla de Clasificación</div>
+      <div class="rank-header">
+        <span>#</span><span>Usuario</span><span>Vic.</span><span>Der.</span><span>Win%</span>
+      </div>
+      <div class="ranking-list" id="ranking-list">
+        <div class="empty">Cargando…</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div class="page" id="page-auth">
+    <div class="card" id="panel-login" style="max-width:400px;margin:0 auto">
+      <div class="card-title"><span>🔑</span> Iniciar Sesión</div>
+      <div id="login-msg"></div>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="login-user" placeholder="Tu nombre de usuario"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="login-pass" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Entrar</button>
+      <p style="text-align:center;margin-top:18px;font-size:14px;color:var(--dim)">
+        ¿No tenés cuenta? <button class="link-btn" onclick="showPanel('register')">Registrarse</button>
+      </p>
+    </div>
+    <div class="card" id="panel-register" style="display:none;max-width:400px;margin:0 auto">
+      <div class="card-title"><span>✨</span> Crear Cuenta</div>
+      <div id="register-msg"></div>
+      <div class="form-group">
+        <label>Usuario</label>
+        <input type="text" id="reg-user" placeholder="Mínimo 3 caracteres"/>
+      </div>
+      <div class="form-group">
+        <label>Contraseña</label>
+        <input type="password" id="reg-pass" placeholder="Mínimo 4 caracteres" onkeydown="if(event.key==='Enter')doRegister()"/>
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Crear cuenta</button>
+      <p style="text-align:center;margin-top:18px;font-size:14px;color:var(--dim)">
+        ¿Ya tenés cuenta? <button class="link-btn" onclick="showPanel('login')">Iniciar sesión</button>
+      </p>
+    </div>
+  </div>
+
+  <!-- PERFIL -->
+  <div class="page" id="page-profile">
+    <div class="logout-row">
+      <button class="logout-btn" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+    <div class="card">
+      <div class="profile-top">
+        <div class="avatar-wrap">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+            <circle cx="22" cy="11" r="8" stroke="white" stroke-width="2.2" fill="none"/>
+            <circle cx="18.5" cy="10" r="1.8" fill="white"/>
+            <circle cx="25.5" cy="10" r="1.8" fill="white"/>
+            <line x1="22" y1="19" x2="22" y2="30" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="22" y1="23" x2="14" y2="28" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="22" y1="23" x2="30" y2="28" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="22" y1="30" x2="16" y2="40" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="22" y1="30" x2="28" y2="40" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <div class="profile-username" id="profile-username">—</div>
+          <div class="profile-tag">Usuario · Warriors Coliseum</div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-box wins"><div class="stat-val" id="stat-wins">0</div><div class="stat-lbl">Victorias</div></div>
+        <div class="stat-box losses"><div class="stat-val" id="stat-losses">0</div><div class="stat-lbl">Derrotas</div></div>
+        <div class="stat-box wr"><div class="stat-val" id="stat-wr">0%</div><div class="stat-lbl">Win Rate</div></div>
+      </div>
+      <div class="wr-bar-wrap">
+        <div class="wr-bar-top"><span>Ratio de victoria</span><span id="wr-label">0%</span></div>
+        <div class="wr-bar"><div class="wr-fill" id="wr-bar"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TURBO -->
+  <div class="page" id="page-turbo">
+    <div class="card">
+      <div class="card-title"><span>🎮</span> Conectar con TurboWarp</div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Activar extensión Fetch</div>
+          <div class="step-text">En TurboWarp Desktop: <strong>Extensiones → Fetch</strong>. Permite hacer peticiones HTTP desde Scratch.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Guardar la URL de tu API</div>
+          <div class="step-text">Guardá la URL de Render en una variable global <span class="pill">API_URL</span>:</div>
+          <div class="code">https://warriors-coliseum.onrender.com</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <div class="step-title">Login desde Scratch</div>
+          <div class="step-text">Bloque "Login" → POST y guardar el token:</div>
+          <div class="code">POST {API_URL}/api/login
+Body: {"username": [usuario], "password": [pass]}
+→ Guardar "token" en variable TOKEN
+→ Guardar "username" en MI_USUARIO</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div>
+          <div class="step-title">Guardar resultado al terminar pelea</div>
+          <div class="step-text">Al terminar el combate:</div>
+          <div class="code">POST {API_URL}/api/match
+Header — Authorization: Bearer {TOKEN}
+Body: {"winner": [ganador], "loser": [perdedor]}</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div>
+          <div class="step-title">Ver ranking en el juego (opcional)</div>
+          <div class="code">GET {API_URL}/api/ranking
+→ Lista de jugadores ordenados por victorias</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const API="";
+let token=localStorage.getItem("wc_token");
+let myUser=localStorage.getItem("wc_user");
+
+function showPage(name,btn){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  if(name==="auth"){
+    if(token){ document.getElementById("page-profile").classList.add("active"); loadProfile(); }
+    else { document.getElementById("page-auth").classList.add("active"); }
+    return;
+  }
+  document.getElementById("page-"+name).classList.add("active");
+  if(name==="ranking") loadRanking();
+}
+
+function showPanel(n){
+  document.getElementById("panel-login").style.display=n==="login"?"block":"none";
+  document.getElementById("panel-register").style.display=n==="register"?"block":"none";
+}
+
+async function api(path,opts={}){
+  const h={"Content-Type":"application/json"};
+  if(token) h["Authorization"]="Bearer "+token;
+  const r=await fetch(API+path,{headers:h,...opts});
+  return r.json();
+}
+
+async function doLogin(){
+  const u=document.getElementById("login-user").value.trim();
+  const p=document.getElementById("login-pass").value;
+  const m=document.getElementById("login-msg"); m.innerHTML="";
+  if(!u||!p) return showMsg(m,"Completá todos los campos","error");
+  const d=await api("/api/login",{method:"POST",body:JSON.stringify({username:u,password:p})});
+  if(d.error) return showMsg(m,d.error,"error");
+  token=d.token; myUser=d.username;
+  localStorage.setItem("wc_token",token); localStorage.setItem("wc_user",myUser);
+  document.getElementById("nav-profile").textContent="👤 "+myUser;
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("nav-profile").classList.add("active");
+  showPage("auth");
+}
+
+async function doRegister(){
+  const u=document.getElementById("reg-user").value.trim();
+  const p=document.getElementById("reg-pass").value;
+  const m=document.getElementById("register-msg"); m.innerHTML="";
+  if(!u||!p) return showMsg(m,"Completá todos los campos","error");
+  const d=await api("/api/register",{method:"POST",body:JSON.stringify({username:u,password:p})});
+  if(d.error) return showMsg(m,d.error,"error");
+  showMsg(m,"¡Cuenta creada! Ahora iniciá sesión.","success");
+  setTimeout(()=>showPanel("login"),1200);
+}
+
+function doLogout(){
+  token=null; myUser=null;
+  localStorage.removeItem("wc_token"); localStorage.removeItem("wc_user");
+  document.getElementById("nav-profile").textContent="👤 Mi Perfil";
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.querySelector(".nav-btn").classList.add("active");
+  showPage("ranking"); loadRanking();
+}
+
+async function loadProfile(){
+  const d=await api("/api/profile");
+  if(d.error){doLogout();return;}
+  document.getElementById("profile-username").textContent=d.username;
+  document.getElementById("stat-wins").textContent=d.wins;
+  document.getElementById("stat-losses").textContent=d.losses;
+  document.getElementById("stat-wr").textContent=d.winrate+"%";
+  document.getElementById("wr-label").textContent=d.winrate+"%";
+  setTimeout(()=>{document.getElementById("wr-bar").style.width=d.winrate+"%";},100);
+}
+
+async function loadRanking(){
+  const list=document.getElementById("ranking-list");
+  list.innerHTML='<div class="empty">Cargando…</div>';
+  const d=await api("/api/ranking");
+  if(!Array.isArray(d)||!d.length){
+    list.innerHTML='<div class="empty">😶 Todavía no hay jugadores en el ranking.</div>'; return;
+  }
+  const medals=["🥇","🥈","🥉"]; const cls=["gold","silver","bronze"];
+  list.innerHTML=d.map((p,i)=>`
+    <div class="rank-row ${cls[i]||''}">
+      <div class="rank-pos">${i<3?medals[i]:i+1}</div>
+      <div class="rank-name">${p.username}</div>
+      <div class="rank-wins">${p.wins}</div>
+      <div class="rank-losses">${p.losses}</div>
+      <div class="rank-wr">${p.winrate}%</div>
+    </div>`).join("");
+}
+
+function showMsg(el,text,type){el.innerHTML=`<div class="msg ${type}">${text}</div>`;}
+
+if(token) document.getElementById("nav-profile").textContent="👤 "+myUser;
+loadRanking();
+</script>
+</body>
+</html>
